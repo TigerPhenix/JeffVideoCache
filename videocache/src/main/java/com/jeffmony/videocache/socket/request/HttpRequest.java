@@ -1,6 +1,7 @@
 package com.jeffmony.videocache.socket.request;
 
 import com.jeffmony.videocache.common.VideoCacheException;
+import com.jeffmony.videocache.utils.LogUtils;
 import com.jeffmony.videocache.utils.ProxyCacheUtils;
 import com.jeffmony.videocache.utils.StorageUtils;
 
@@ -25,6 +26,7 @@ import javax.net.ssl.SSLException;
 
 public class HttpRequest {
     private static final String HEADER_RANGE = "range";   //头部统一转化为小写
+    private static final String TAG = "HttpRequest";
     private final BufferedInputStream mInputStream;
     private final String mRemoteIP;
     private final HashMap<String, String> mHeaders;
@@ -38,9 +40,13 @@ public class HttpRequest {
 
         // isLoopbackAddress() : local address; 127.0.0.0 ~ 127.255.255.255
         // isAnyLocalAddress() : normal address ?
-        mRemoteIP = inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress()
-                        ? ProxyCacheUtils.LOCAL_PROXY_HOST
-                        : inetAddress.getHostAddress();
+
+        boolean userProxy=inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress();
+        mRemoteIP = userProxy ? ProxyCacheUtils.LOCAL_PROXY_HOST : inetAddress.getHostAddress();
+
+        LogUtils.i(TAG,"userProxy="+userProxy+",localProxy="+ProxyCacheUtils.LOCAL_PROXY_HOST+",inetAdrress="+inetAddress.getHostAddress());
+
+        LogUtils.i(TAG,"mRemoteIP="+mRemoteIP);
         mHeaders = new HashMap<>();
         mKeepAlive = false;
     }

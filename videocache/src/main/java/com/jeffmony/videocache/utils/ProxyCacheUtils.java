@@ -9,7 +9,12 @@ import com.jeffmony.videocache.common.VideoMime;
 import com.jeffmony.videocache.common.VideoParams;
 
 import java.io.Closeable;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.security.MessageDigest;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -23,8 +28,8 @@ public class ProxyCacheUtils {
 
     private static final String TAG = "ProxyCacheUtils";
 
-    public static final String LOCAL_PROXY_HOST = "127.0.0.1";
-    public static final String LOCAL_PROXY_URL = "http://" + LOCAL_PROXY_HOST;
+    public static String LOCAL_PROXY_HOST=null;
+    public static String LOCAL_PROXY_URL=null;
     public static final String SEG_PROXY_SPLIT_STR = "&jeffmony_seg&";           //M3U8 分片文件分隔符
     public static final String VIDEO_PROXY_SPLIT_STR = "&jeffmony_video&";       //视频分隔符
     public static final String HEADER_SPLIT_STR = "&jeffmony_header&";           //请求头部分隔符
@@ -244,6 +249,30 @@ public class ProxyCacheUtils {
         }
         int dotIndex = name.lastIndexOf('.');
         return (dotIndex >= 0 && dotIndex < name.length()) ? name.substring(dotIndex) : "";
+    }
+
+    public static void initIP() {
+//        LOCAL_PROXY_HOST = "127.0.0.1";
+        LOCAL_PROXY_HOST = getLocalIpAddress();
+        LOCAL_PROXY_URL = "http://" + LOCAL_PROXY_HOST;
+        LogUtils.i(TAG,"initIP,LOCAL_PROXY_URL="+LOCAL_PROXY_URL);
+    }
+
+    public static String getLocalIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
 }

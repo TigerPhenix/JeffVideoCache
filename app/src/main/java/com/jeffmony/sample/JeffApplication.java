@@ -3,6 +3,7 @@ package com.jeffmony.sample;
 import android.app.Application;
 
 import com.jeffmony.videocache.VideoProxyCacheManager;
+import com.jeffmony.videocache.utils.ProxyCacheUtils;
 import com.jeffmony.videocache.utils.StorageUtils;
 
 import java.io.File;
@@ -12,6 +13,8 @@ public class JeffApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        ProxyCacheUtils.initIP();
 
         File saveFile = StorageUtils.getVideoFileDir(this);
         if (!saveFile.exists()) {

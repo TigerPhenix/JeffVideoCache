@@ -61,6 +61,7 @@ public class ExoPlayerImpl extends BasePlayerImpl {
         } else {
             playUrl = uri.toString();
         }
+        LogUtils.i(TAG,"setDataSource:playUrl="+playUrl);
         mMediaSource = createMediaSource(Uri.parse(playUrl), null);
     }
 
